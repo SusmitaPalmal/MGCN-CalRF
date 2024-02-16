@@ -1,2 +1,3 @@
 # MGCN-CalRF
-Code will be updated soon
+Code and data will be provided on request.
+Mail at: susmitapalmal11@gmail.com
