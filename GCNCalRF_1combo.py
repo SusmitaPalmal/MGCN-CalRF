@@ -225,33 +225,33 @@ for combo_content,combo__cite in zip(list(list_content), list(list_cite)):
  
 
       # start = time.perf_counter()
-      cora_cites1 = pd.read_csv( cite1,          
+      TCGA_cites1 = pd.read_csv( cite1,          
           sep="\t",  # tab-separated
           # sep='	',
           header=None,  # no heading row
           names=["target", "source"],  # set our own names for the columns
       )
-      # print(cora_cites)
+      # print(TCGA_cites)
 
-      cora_raw_content1 = pd.read_csv(          
+      TCGA_raw_content1 = pd.read_csv(          
           content1,
           sep=",",  # tab-separated
           #sep="\t", # space-separated
           header=None,  # no heading row
-          #names=["id", *cora_feature_names, "subject"],  # set our own names for the columns
+          #names=["id", *TCGA_feature_names, "subject"],  # set our own names for the columns
       )
       
-      print("shape modality1=========",cora_raw_content1.shape)
-      cora_raw_content1.rename(columns={ cora_raw_content1.columns[0]: "id" }, inplace = True)
-      cora_raw_content1.rename(columns={ cora_raw_content1.columns[-1]: "subject" }, inplace = True)
-      #cora_raw_content
-      cora_content_str_subject1 = cora_raw_content1.set_index("id")
-      cora_content_no_subject1 = cora_content_str_subject1.drop(columns="subject")
+      print("shape modality1=========",TCGA_raw_content1.shape)
+      TCGA_raw_content1.rename(columns={ TCGA_raw_content1.columns[0]: "id" }, inplace = True)
+      TCGA_raw_content1.rename(columns={ TCGA_raw_content1.columns[-1]: "subject" }, inplace = True)
+      #TCGA_raw_content
+      TCGA_content_str_subject1 = TCGA_raw_content1.set_index("id")
+      TCGA_content_no_subject1 = TCGA_content_str_subject1.drop(columns="subject")
 
-      #print("shape is",cora_content_no_subject)
-      cora_no_subject1 = StellarGraph({"paper": cora_content_no_subject1}, {"cites": cora_cites1})
-      G1=cora_no_subject1
-      node_label1 = cora_content_str_subject1["subject"]
+      #print("shape is",TCGA_content_no_subject)
+      TCGA_no_subject1 = StellarGraph({"paper": TCGA_content_no_subject1}, {"cites": TCGA_cites1})
+      G1=TCGA_no_subject1
+      node_label1 = TCGA_content_str_subject1["subject"]
 
           
       
@@ -287,7 +287,7 @@ for combo_content,combo__cite in zip(list(list_content), list(list_cite)):
             no_of_fold=10
             i=1
             kf=StratifiedKFold(n_splits=no_of_fold, random_state=42, shuffle=True)
-            for train_index,test_index in kf.split(cora_content_no_subject1,node_label1):
+            for train_index,test_index in kf.split(TCGA_content_no_subject1,node_label1):
                 #   print(train_index)
                 #   print(test_index)
                   # break
