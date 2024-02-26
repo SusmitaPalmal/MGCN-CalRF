@@ -1,5 +1,2 @@
 # MGCN-CalRF
-From each dataset among six different modalities the edges have been established among the samples. We have used pearson correlation for this. It is done in graphdatapreprocessing.py.
-For single modality combinations the classification code is available in GCNCalRF_1combo.py. 
-Required Pythoh version 3.7. Detailed software requirements are given in the 'software requirement.txt' file.
-For any query regaring the code and data contact here: susmitapalmal11@gmail.com
+Edges have been established among the samples in each dataset from six different modalities. Pearson correlation has been used for this purpose, implemented in graphdatapreprocessing.py. The classification code for single modality combinations is available in GCNCalRF_1combo.py. Python version 3.7 is required. Detailed software requirements are provided in the 'software requirement.txt' file. For any queries regarding the code and data, please contact susmitapalmal11@gmail.com.
