@@ -1,41 +1,25 @@
 
 
+#single modality has been taken here each time for the experiment#
 import sys
-import stellargraph as sg
-
-try:
-    sg.utils.validate_notebook_version("1.0.0rc1")
-except AttributeError:
-    raise ValueError(
-        f"This notebook requires StellarGraph version 1.0.0rc1, but a different version {sg.__version__} is installed.  Please see <https://github.com/stellargraph/stellargraph/issues/1172>."
-    ) from None
-
-
-import pandas as pd
-import numpy as np
 import os
-
 import stellargraph as sg
 from stellargraph.mapper import FullBatchNodeGenerator
 from stellargraph.layer import GCN
 from stellargraph import StellarGraph
-
 from tensorflow.keras import layers, optimizers, losses, metrics, Model
 from sklearn import preprocessing, model_selection
 from IPython.display import display, HTML
 import matplotlib.pyplot as plt
 import time
-
+import pandas as pd
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.callbacks import EarlyStopping
-
 from numpy import savetxt
 from sklearn.model_selection import StratifiedKFold
 from numpy.random import seed
 from sklearn.calibration import CalibratedClassifierCV
-
-
-
+import numpy as np
 from sympy import solve, symbols
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
@@ -44,20 +28,18 @@ from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_curve, roc_auc_score,precision_recall_curve,auc
 from sklearn import svm
-
 seed(1)
 
 from imblearn.over_sampling import SMOTE
 
 def smote_upsample(stacked_feature_train, y_train_rf):
   oversample = SMOTE()
-  #print("before upsampling shape: \n ")
-  #print(y_train_rf)
+ 
 
-  X, y = oversample.fit_resample(stacked_feature_train, y_train_rf)
-  #print(" after upsampling shape: \n ")
-  #print(y)
+  X, y = oversample.fit_resample(stacked_feature_train, y_train_rf) 
   return(X,y)
+
+
 
 
 
@@ -67,14 +49,12 @@ def smote_upsample(stacked_feature_train, y_train_rf):
 #=============== Graph Based Feature extraction===============================
 
 def StellerGraphConvolution(train_subjectsMain, train_subjects,test_subjects,val_subjects,G,node_label,str1,Modality,fold):
-      print(train_subjectsMain.value_counts().to_frame())
-      # print(train_subjects.value_counts().to_frame())
+      print(train_subjectsMain.value_counts().to_frame())      
       print(train_subjects.value_counts().to_frame())
-
       print(test_subjects.value_counts().to_frame())
       print(val_subjects.value_counts().to_frame())
 
-      #print(val_subjects)
+     
 
 
       target_encoding = preprocessing.LabelBinarizer()
@@ -87,7 +67,7 @@ def StellerGraphConvolution(train_subjectsMain, train_subjects,test_subjects,val
       val_targets = to_categorical(val_targets, num_classes=2)
       test_targets = target_encoding.transform(test_subjects)
       test_targets = to_categorical(test_targets, num_classes=2)
-      #print(test_targets)
+     
 
       #=================================================
       train_targets_main = target_encoding.fit_transform(train_subjectsMain)
@@ -197,20 +177,18 @@ files_content = [ "file_cln.csv",\
          "file_mrna.csv",\
          "file_wsi.csv"]
 
-files_cite= ["/edges/cln0.9_edges.cites",\
-           "/edges/cnv_edges.cites",\
-              "/edges/DNA_edges.cites",\
-              "/edges/mir_edges.cites",\
-              "/edges/mrna_edges.cites",\
-              "/edges/wsi_edges.cites"]      
+files_cite= ["edges/cln_edges.cites",\
+           "edges/cnv_edges.cites",\
+              "edges/DNA_edges.cites",\
+              "edges/mir_edges.cites",\
+              "edges/mrna_edges.cites",\
+              "edges/wsi_edges.cites"]       
 
 
-
-# Get all permutations of 
 list_content = combinations(files_content, 1)
 list_cite=combinations(files_cite, 1)
 
-file1 = open("output_1mod_upsampling.csv","w")
+file1 = open("output_1mod.csv","w")
 
 
 
@@ -225,37 +203,40 @@ for combo_content,combo__cite in zip(list(list_content), list(list_cite)):
  
 
       # start = time.perf_counter()
-      TCGA_cites1 = pd.read_csv( cite1,          
+      DATA_cites1 = pd.read_csv( cite1,          
           sep="\t",  # tab-separated
           # sep='	',
           header=None,  # no heading row
           names=["target", "source"],  # set our own names for the columns
       )
-      # print(TCGA_cites)
+      # print(DATA_cites)
 
-      TCGA_raw_content1 = pd.read_csv(          
+      DATA_raw_content1 = pd.read_csv(          
           content1,
           sep=",",  # tab-separated
           #sep="\t", # space-separated
           header=None,  # no heading row
-          #names=["id", *TCGA_feature_names, "subject"],  # set our own names for the columns
+          #names=["id", *DATA_feature_names, "subject"],  # set our own names for the columns
       )
       
-      print("shape modality1=========",TCGA_raw_content1.shape)
-      TCGA_raw_content1.rename(columns={ TCGA_raw_content1.columns[0]: "id" }, inplace = True)
-      TCGA_raw_content1.rename(columns={ TCGA_raw_content1.columns[-1]: "subject" }, inplace = True)
-      #TCGA_raw_content
-      TCGA_content_str_subject1 = TCGA_raw_content1.set_index("id")
-      TCGA_content_no_subject1 = TCGA_content_str_subject1.drop(columns="subject")
+      print("shape modality1=========",DATA_raw_content1.shape)
+      DATA_raw_content1.rename(columns={ DATA_raw_content1.columns[0]: "id" }, inplace = True)
+      DATA_raw_content1.rename(columns={ DATA_raw_content1.columns[-1]: "subject" }, inplace = True)
+      #DATA_raw_content
+      DATA_content_str_subject1 = DATA_raw_content1.set_index("id")
+      DATA_content_no_subject1 = DATA_content_str_subject1.drop(columns="subject")
 
-      #print("shape is",TCGA_content_no_subject)
-      TCGA_no_subject1 = StellarGraph({"paper": TCGA_content_no_subject1}, {"cites": TCGA_cites1})
-      G1=TCGA_no_subject1
-      node_label1 = TCGA_content_str_subject1["subject"]
+      #print("shape is",DATA_content_no_subject)
+      DATA_no_subject1 = StellarGraph({"paper": DATA_content_no_subject1}, {"cites": DATA_cites1})
+      G1=DATA_no_subject1
+      node_label1 = DATA_content_str_subject1["subject"]
 
           
       
 
+
+      #==============================================================================================================
+      #============== Clinical modality==================================================================================
 
       df3 = pd.read_csv('file_cln.csv',header = None) 
       array = df3.values
@@ -275,6 +256,7 @@ for combo_content,combo__cite in zip(list(list_content), list(list_cite)):
       SPE_=0
       BALN=0
       F1_=0
+      AUC_=0
 
       for itr in range (0,1):
             AVG_SENSITIVITY=0
@@ -284,10 +266,11 @@ for combo_content,combo__cite in zip(list(list_content), list(list_cite)):
             avg_acc=0
             avgMcc=0
             avgBalAcc=0
+            avgAUC=0            
             no_of_fold=10
             i=1
             kf=StratifiedKFold(n_splits=no_of_fold, random_state=42, shuffle=True)
-            for train_index,test_index in kf.split(TCGA_content_no_subject1,node_label1):
+            for train_index,test_index in kf.split(DATA_content_no_subject1,node_label1):
                 #   print(train_index)
                 #   print(test_index)
                   # break
@@ -320,8 +303,8 @@ for combo_content,combo__cite in zip(list(list_content), list(list_cite)):
 
    
                   X_train,y3_train=smote_upsample( X_train,y3_train)
-                  
-                  #=====================================================
+        
+                  #==========================Calibrated classification using Random Forest===========================
                   base_classifiers = []
 
                   # Number of base classifiers to use
@@ -346,6 +329,8 @@ for combo_content,combo__cite in zip(list(list_content), list(list_cite)):
                   # Combine conformal predictions to make final predictions using the "voting" method
                   final_predictions = np.round(np.mean(conformal_predictions, axis=0))
                   y_pred1=final_predictions
+                  
+                  
                   #=====================================================
                   
                   cm1 = confusion_matrix(y3_test,y_pred1)
@@ -357,31 +342,28 @@ for combo_content,combo__cite in zip(list(list_content), list(list_cite)):
                   FP= cm1[0][1]
                   FN=cm1[1][0]
 
-                  #print("TP,TN,FP,FN",TP,TN,FP,FN)
-                  
-                  # Sensitivity, hit rate, recall, or true positive rate
                   TPR = TP/(TP+FN)
-                  #print(" sensitivity or true positiverate recall",TPR)
-                  # Specificity or true negative rate
+             
                   TNR = TN/(TN+FP) 
-                  #print(" specificity or true negative rate",TNR)
-                  # Precision or positive predictive value
+                
                   PPV = TP/(TP+FP)
-                 
+               
+                  auc = roc_auc_score(y3_test, y_pred1)
+
                   f1_value=(2*PPV*TPR)/(PPV+TPR)
                
                   AVG_SENSITIVITY=AVG_SENSITIVITY+  TPR
                   AVG_SPECIFICITY=AVG_SPECIFICITY+TNR
                   AVG_PRECISION=AVG_PRECISION+ PPV
                   b_ac=(TPR+TNR)/2
-                  avgBalAcc=avgBalAcc+b_ac
-                  #AVG_PRAUC=AVG_PRAUC+auc_precision_recall
+                  avgBalAcc=avgBalAcc+b_ac               
                   avg_f1=avg_f1+f1_value  
                   acc= (TP+TN)/(TP+FP+TN+FN)
                   avg_acc=avg_acc+acc
                   mcc=matthews_corrcoef(y3_test,y_pred1)
                   avgMcc=avgMcc+mcc
-               
+                  avgAUC=avgAUC+auc              
+                  
                   i=i+1
          
             avg_acc=avg_acc/10
@@ -395,16 +377,15 @@ for combo_content,combo__cite in zip(list(list_content), list(list_cite)):
             AVG_SPECIFICITY=AVG_SPECIFICITY/10
             AVG_SPECIFICITY = round(AVG_SPECIFICITY, 3)
             avgBalAcc=avgBalAcc/10
-            avgBalAcc = round(avgBalAcc, 3)
-            #AVG_PRAUC=AVG_PRAUC/10
+            avgBalAcc = round(avgBalAcc, 3)       
             avg_f1=avg_f1/10
             avg_f1 = round(avg_f1, 3)
+            avg_AUC=avgAUC/10
+            avgAUC = round(avgAUC, 3)            
 
             file1.write("\n avg Acc ,\t")         
             file1.write(str(avg_acc))
-            # file1.write("\n avg AUC ,\t")
-            # au=rf_auc/10
-            # file1.write(str(au))
+         
             file1.write("\n avg mcc ,\t")           
             file1.write(str(avgMcc))
             file1.write("\n avg sensitivity or recall ,\t")
@@ -419,6 +400,8 @@ for combo_content,combo__cite in zip(list(list_content), list(list_cite)):
             file1.write(" \n balanced accuracy, \t")
             file1.write(str(bal_ac))
             file1.write("\n")
+            file1.write(" \n AUC, \t")
+            file1.write(str(avgAUC))
+            file1.write("\n")            
 
-          
 file1.close()
