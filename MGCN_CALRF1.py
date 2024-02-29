@@ -170,15 +170,13 @@ from sklearn.metrics import precision_score
 from itertools import combinations
 
 
-files_content = [ "file_cln.csv",\
-        "file_cnv.csv",\
+files_content = [ "file_cnv.csv",\
          "file_dna.csv",\
          "file_mir.csv",\
          "file_mrna.csv",\
          "file_wsi.csv"]
 
-files_cite= ["edges/cln_edges.cites",\
-           "edges/cnv_edges.cites",\
+files_cite= ["edges/cnv_edges.cites",\
               "edges/DNA_edges.cites",\
               "edges/mir_edges.cites",\
               "edges/mrna_edges.cites",\
